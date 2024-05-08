@@ -1,0 +1,41 @@
+@use './utils/' as *;
+
+header{
+   background-color: var(--elements-color);
+   box-shadow: 0 0 3px 3px var(--box-shadow-color);
+   .header-inner{
+      padding-block:.9em;
+      max-width:90%;
+      margin: auto;
+      @include flexObj;
+      
+      @include MediaQueryMD2{
+         max-width:94%;
+      }
+   }
+}
+
+h1{
+   color:var(--text-color);
+   font-size: clamp(1.125rem, 0.435vw + 1.035rem, 1.438rem);
+}
+
+.theme-switcher-container{
+   button{
+      @include flexObj($justify:center,$gap:5px);
+      color:var(--text-color);
+      font-weight: 600;
+      transition: .3s ease-in-out;
+
+      &:hover{
+         opacity: .7;
+      }
+   }
+
+   svg{
+      font-size:1rem;
+      path{
+         color:inherit;
+      }
+   }
+}

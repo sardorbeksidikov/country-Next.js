@@ -1,0 +1,29 @@
+$font-family: 'Nunito Sans', sans-serif;
+$font-weight_Light: 300;
+$font-weight_Bold: 600;
+$font-weight_Bolder: 800;
+
+@mixin flexObj($direction:row,$justify:space-between,$align:center,$gap:10px){
+   display:flex;
+   flex-direction: $direction;
+   justify-content: $justify;
+   align-items: $align;
+   gap: $gap;
+}
+
+@mixin MediaQueryLS{
+   @media (min-width:70rem) {
+      @content;
+   }
+}
+@mixin MediaQueryMD{
+   @media (min-width:40rem) {
+      @content;
+   }
+}
+
+@mixin MediaQueryMD2{
+   @media (min-width:50rem) {
+      @content;
+   }
+}
