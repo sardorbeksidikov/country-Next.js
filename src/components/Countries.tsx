@@ -1,61 +1,60 @@
-import { SearchContext } from "@/context/SearchContextProvider";
-import { nanoid } from "nanoid";
-import { useState, useEffect, useContext } from "react"; 
-import Country from "./Country";
-import { ICountriesDetailsProps } from "@/app/pages";
-import { ICountryDetails } from '@/typings';
-
-export default function Countries(props:ICountriesDetailsProps){
-
-   const { countriesData } = props;
-   const { foundCountries } = useContext(SearchContext)
-   const [filteredCountriesArray,setFilteredCountriesArray] = useState<ICountryDetails[]>([])
-
-
-   useEffect(() => {
-      if(!countriesData.length)return;
-      const firstSort =  countriesData.sort((a,b) => {
-         return a.name.common.localeCompare(b.name.common)
-      })
-      const secondSort = countriesData.sort((a,b) => {
-         return a.population + a.population
-      })
-
-      setFilteredCountriesArray(shuffleArray([...firstSort,...secondSort]))
-   },[countriesData])
-
-   function shuffleArray<T>(array: T[]): T[] {
-      const shuffledArray = [...array]
-      for (let i = shuffledArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-      }
-      return shuffledArray.splice(0,8)
-   }
-
-   return(
-      <>
-      {
-         !countriesData.length ?
-         <h2>Error Fetching Countries Data, Try Again</h2>
-         :
-         foundCountries.length ?
-         <div className="countries-section">
-            {
-               foundCountries.map((data,index) => {
-                  return <Country key={index} CountryDetails={data} />
-               })
-            }
-         </div>
-         :
-         <div className="countries-section">
-            {
-               filteredCountriesArray.map((data,index) => {
-                  return <Country key={index} CountryDetails={data} />
-               })
-            }
-         </div>
-      }
-      </>
-   )
+"use client"
+import Link from "next/link";
+import Image from "next/image";
+import { useGlobalContext } from "./Context";
+import { useEffect, useState } from "react";
+type countryType = {
+    name: {common: string},
+    population: number,
+    region: string,
+    capital: string[],
+    flags: {svg: string}
 }
+
+const Countries = (data:any) => {
+    const {search, filter} = useGlobalContext();
+    const values:Array<countryType> = Object.values(data);
+    const [filteredValues, setFilteredValues] = useState(values);
+    
+    const searchAndFilter = () => {
+        let filtVal = values;
+        if(!search){
+            filtVal = values
+        }
+        if(filter){
+            filtVal = filtVal.filter((country) => country.region.toLowerCase() === filter.toLowerCase())
+        }
+        if(search){
+            filtVal = filtVal.filter((country) => country.name.common.toLowerCase().includes(search.toLowerCase()))
+        }
+        setFilteredValues(filtVal)
+    }
+
+    useEffect(() => {
+        searchAndFilter()
+    }, [search, filter])
+    
+    return (<>
+    {filteredValues?.map((i:countryType) => {
+        return (
+        <Link href={`/${i.name.common}`} key={i.name.common} className="bg-white dark:bg-dark-blue custom-shadow w-[250px] cursor-pointer transition-all rounded-[4px] overflow-hidden hover:scale-105">
+            <Image 
+            src={i.flags.svg}
+            width={265}
+            height={159}
+            alt="flag"
+            className="w-full aspect-[265/159]"
+            />
+            <section className="p-4 md:p-6">
+                <h3 className="font-bold text-base">{i.name.common}</h3>
+                <p className="text-sm font-semibold">Population: <span className="font-normal text-dark-gray dark:text-very-light-gray">{Intl.NumberFormat('en-US').format(i.population)}</span> </p>
+                <p className="text-sm font-semibold">Region: <span className="font-normal text-dark-gray dark:text-very-light-gray">{i.region}</span></p>
+                <p className="text-sm font-semibold">Capital: <span className="font-normal text-dark-gray dark:text-very-light-gray">{i.capital}</span></p>
+            </section>
+        </Link>
+        )
+    })}
+    </>)
+}
+
+export default Countries
